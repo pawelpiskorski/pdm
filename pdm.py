@@ -9,11 +9,11 @@ Ts = 2*np.pi/fs
 nyq = fs/2
 upsample = 64
 
-duration = 2  # seconds
+duration = 1  # seconds
 time = np.arange(0, duration*fs, 1)
-s = 0.7*np.sin(4027*Ts*time)+0.2*np.sin(8013*Ts*time)  # signal to encode
+s = 0.7*np.sin(4027*Ts*time) +0.3*np.sin(8013*Ts*time)  # signal to encode
 length = s.shape[0]
-
+np.random.seed(19259)
 
 # encode
 
@@ -23,7 +23,7 @@ Rnyq = upsample*nyq
 
 # noise shaped to occupy frequency band beyond the signal
 # (since after upsampling maximum frequency is upsample*nyq)
-b, a = signal.butter(7, 2*nyq/Rnyq, btype='high', analog=False)
+b, a = signal.butter(3, 1.2*nyq/Rnyq, btype='high', analog=False)
 y = signal.filtfilt(b, a, np.random.normal(0., 1., pdm.shape[0]))
 
 # quantize signal to just -1 or 1 depending on sign.
@@ -32,7 +32,7 @@ pdm = np.sign(pdm+y)
 
 
 # decode: low pass to original band, and resample
-b, a = signal.butter(7, nyq/Rnyq, btype='low', analog=False)
+b, a = signal.butter(5, nyq/Rnyq, btype='low', analog=False)
 d = signal.filtfilt(b, a, pdm)
 d = signal.resample(d, length)
 
